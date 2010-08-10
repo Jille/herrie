@@ -60,6 +60,10 @@ static int gui_input_curfocus = GUI_FOCUS_BROWSER;
  */
 static struct vfsmatch *cursearch = NULL;
 /**
+ * @brief Direction of the current search.
+ */
+static int cursearch_forward = 1;
+/**
  * @brief The last seek string that has been entered.
  */
 static char *curseek = NULL;
@@ -216,10 +220,10 @@ gui_input_asksearch(void)
 
 /**
  * @brief Ask the user to enter a search string when none was given and
- *        search for the next item matching the search string.
+ *        search for the next/previous item matching the search string.
  */
 static void
-gui_input_searchnext(void)
+_gui_input_searchnext(int forward)
 {
 	int nfocus = GUI_FOCUS_PLAYQ;
 
@@ -237,13 +241,13 @@ gui_input_searchnext(void)
 	 * last two.
 	 */
 	if (gui_input_curfocus == GUI_FOCUS_PLAYQ &&
-	    gui_playq_searchnext(cursearch) == 0) {
+	    gui_playq_searchnext(cursearch, forward) == 0) {
 		goto found;
-	} else if (gui_browser_searchnext(cursearch) == 0) {
+	} else if (gui_browser_searchnext(cursearch, forward) == 0) {
 		nfocus = GUI_FOCUS_BROWSER;
 		goto found;
 	} else if (gui_input_curfocus != GUI_FOCUS_PLAYQ &&
-	    gui_playq_searchnext(cursearch) == 0) {
+	    gui_playq_searchnext(cursearch, forward) == 0) {
 		goto found;
 	}
 
@@ -258,12 +262,52 @@ found:	/* Focus the window with the match and redraw them. */
 }
 
 /**
+ * @brief Ask the user to enter a search string when none was given and
+ *        search for the previous item matching the search string.
+ */
+static void
+gui_input_searchnext(void)
+{
+	_gui_input_searchnext(cursearch_forward);
+}
+
+/**
+ * @brief Ask the user to enter a search string when none was given and
+ *        search for the next item matching the search string.
+ */
+static void
+gui_input_searchprevious(void)
+{
+	_gui_input_searchnext(!cursearch_forward);
+}
+
+/**
  * @brief Ask the user to enter a new search string and perform the
  *        first search.
  */
 static void
 gui_input_search(void)
 {
+	/* We will be searching forward with 'n' and backwards with 'N' */
+	cursearch_forward = 1;
+
+	if (gui_input_asksearch() != 0)
+		return;
+
+	/* Just simulate a 'n' button */
+	gui_input_searchnext();
+}
+
+/**
+ * @brief Ask the user to enter a new search string and perform the
+ *        first backwards search.
+ */
+static void
+gui_input_search_backwards(void)
+{
+	/* We will be searching forward with 'N' and backwards with 'n' */
+	cursearch_forward = 0;
+
 	/* Always ask for a search string */
 	if (gui_input_asksearch() != 0)
 		return;
@@ -480,7 +524,9 @@ static struct gui_binding kbdbindings[] = {
 	{ -1, '\t', 			gui_input_switchfocus },
 	{ -1, CTRL('W'),		gui_input_switchfocus },
 	{ -1, '/',			gui_input_search },
+	{ -1, '?',			gui_input_search_backwards },
 	{ -1, 'n',			gui_input_searchnext },
+	{ -1, 'N',			gui_input_searchprevious },
 	{ -1, KEY_LEFT,			gui_browser_dir_parent },
 	{ -1, KEY_RIGHT,		gui_browser_dir_enter },
 

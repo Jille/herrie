@@ -352,9 +352,9 @@ gui_browser_playq_add_before(void)
 }
 
 int
-gui_browser_searchnext(const struct vfsmatch *vm)
+gui_browser_searchnext(const struct vfsmatch *vm, int forward)
 {
-	return gui_vfslist_searchnext(win_browser, vm);
+	return gui_vfslist_searchnext(win_browser, vm, forward);
 }
 
 /**
