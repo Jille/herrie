@@ -8,7 +8,6 @@ Graphical user interface:
 - Allow numeric multipliers just like vi
 - Add copy/paste functionality to playlist
 - Use different colors for files, playlists and directories
-- Recursive searching
 - Show whether repeat is turned on
 - Make startup-configuration of repeat-switch configurable
 - Allow Herrie to be controlled outside the interface through /tmp
