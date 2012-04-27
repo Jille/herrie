@@ -39,3 +39,6 @@ Virtual filesystem:
 Documentation:
 - Usage guide
 - Write a developers guide?
+
+Other:
+- Raise an error if you have errors in your configuration file
