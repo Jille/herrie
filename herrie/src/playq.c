@@ -258,7 +258,7 @@ playq_init(int autoplay, int xmms, int load_dumpfile)
 		funcs = &xmms_funcs;
 		playq_repeat = 1;
 	}
-	switch(config_getopt_bool("playq.repeat")) {
+	switch (config_getopt_bool("playq.repeat")) {
 		case 1:
 			playq_repeat = 1;
 			break;
