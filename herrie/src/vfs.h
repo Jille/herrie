@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2006-2009 Ed Schouten <ed@80386.nl>
+ * Copyright (c) 2006-2011 Ed Schouten <ed@80386.nl>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -10,7 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -415,6 +415,22 @@ FILE		*vfs_fopen(const char *filename, const char *mode);
  * @brief fgets()-like routine that performs newline-stripping.
  */
 int		vfs_fgets(char *str, size_t size, FILE *fp);
+/**
+ * @brief Initialize the VFS system cache if enabled.
+ */
+void		vfs_cache_init(void);
+/**
+ * @brief Add entry to the VFS cache.
+ */
+void		vfs_cache_add(const struct vfsref *vr);
+/**
+ * @brief Obtain entry from the VFS cache.
+ */
+struct vfsref 	*vfs_cache_lookup(const char *filename);
+/**
+ * @brief Purge the VFS cache.
+ */
+void		vfs_cache_purge(void);
 
 /**
  * @brief Get the friendly name of the current VFS reference.

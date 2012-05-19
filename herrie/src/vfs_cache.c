@@ -24,76 +24,64 @@
  * SUCH DAMAGE.
  */
 /**
- * @file audio_output_pulse.c
- * @brief PulseAudio audio output driver.
+ * @file vfs_cache.c
+ * @brief Virtual filesystem cache.
  */
 
 #include "stdinc.h"
 
-#include <pulse/simple.h>
-
-#include "audio_file.h"
-#include "audio_output.h"
+#include "config.h"
 #include "gui.h"
+#include "vfs.h"
 
-/**
- * @brief Handle to an audio device handle if one has already been opened.
- */
-static pa_simple*	devptr = NULL;
-/**
- * @brief Format of the current open audio device handle.
- */
-static pa_sample_spec	devfmt = { PA_SAMPLE_S16LE, 0, 0 };
+static GHashTable *refcache = NULL;
 
-int
-audio_output_open(void)
+static void
+vfs_cache_destroyvalue(void *data)
 {
-	return (0);
-}
+	struct vfsref *vr = data;
 
-int
-audio_output_play(struct audio_file *fd)
-{
-	int16_t buf[2048];
-	size_t len;
-
-	if ((len = audio_file_read(fd, buf, sizeof buf / sizeof(int16_t))) == 0)
-		return (-1);
-
-	if (devfmt.rate != fd->srate || devfmt.channels != fd->channels) {
-		/* Sample rate or amount of channels has changed */
-		audio_output_close();
-
-		devfmt.rate = fd->srate;
-		devfmt.channels = fd->channels;
-	}
-
-	if (devptr == NULL) {
-		/* Open the device */
-		devptr = pa_simple_new(NULL, APP_NAME,
-		    PA_STREAM_PLAYBACK, NULL, "Audio output", &devfmt,
-		    NULL, NULL, NULL);
-		if (devptr == NULL) {
-			gui_msgbar_warn(_("Cannot open the audio device."));
-			return (-1);
-		}
-	}
-
-	if (pa_simple_write(devptr, buf, len * sizeof(int16_t), NULL) != 0) {
-		/* No success - device must be closed */
-		audio_output_close();
-		return (-1);
-	}
-
-	return (0);
+	vfs_close(vr);
 }
 
 void
-audio_output_close(void)
+vfs_cache_init(void)
 {
-	if (devptr != NULL) {
-		/* Close device */
-		pa_simple_free(devptr);
-		devptr = NULL;
+	if (!config_getopt_bool("vfs.cache"))
+		return;
+	refcache = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
+	    vfs_cache_destroyvalue);
+}
+
+void
+vfs_cache_purge(void)
+{
+	if (refcache != NULL) {
+		g_hash_table_remove_all(refcache);
+		gui_msgbar_warn(_("VFS cache purged."));
 	}
+}
+
+void
+vfs_cache_add(const struct vfsref *nvr)
+{
+	struct vfsref *vr;
+
+	if (refcache != NULL) {
+		vr = vfs_dup(nvr);
+		g_hash_table_replace(refcache, vr->ent->filename, vr);
+	}
+}
+
+struct vfsref *
+vfs_cache_lookup(const char *filename)
+{
+	struct vfsref *vr;
+
+	if (refcache != NULL) {
+		vr = g_hash_table_lookup(refcache, filename);
+		if (vr != NULL)
+			return vfs_dup(vr);
+	}
+	return (NULL);
 }

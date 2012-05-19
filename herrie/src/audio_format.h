@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2006-2009 Ed Schouten <ed@80386.nl>
+ * Copyright (c) 2006-2011 Ed Schouten <ed@80386.nl>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -10,7 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -67,6 +67,25 @@ size_t mp3_read(struct audio_file *fd, int16_t *buf, size_t len);
  */
 void mp3_seek(struct audio_file *fd, int len, int rel);
 #endif /* BUILD_MP3 */
+
+#ifdef BUILD_GST
+/**
+ * @brief Open an GST file.
+ */
+int gst_open(struct audio_file *fd, const char *ext);
+/**
+ * @brief Close and clean up the GST file.
+ */
+void gst_close(struct audio_file *fd);
+/**
+ * @brief Read data from the GST file and place it in buf.
+ */
+size_t gst_read(struct audio_file *fd, int16_t *buf, size_t len);
+/**
+ * @brief Seek the GST file a relatime amount of seconds.
+ */
+void gst_seek(struct audio_file *fd, int len, int rel);
+#endif /* BUILD_GST */
 
 #ifdef BUILD_SNDFILE
 /**

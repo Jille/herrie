@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2006-2009 Ed Schouten <ed@80386.nl>
+ * Copyright (c) 2006-2011 Ed Schouten <ed@80386.nl>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -10,7 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -67,6 +67,9 @@ struct audio_format {
  * @brief List of audio formats.
  */
 static struct audio_format formats[] = {
+#ifdef BUILD_GST
+	{ gst_open, gst_close, gst_read, gst_seek },
+#endif /* !BUILD_GST */
 #ifdef BUILD_VORBIS
 	{ vorbis_open, vorbis_close, vorbis_read, vorbis_seek },
 #endif /* !BUILD_VORBIS */
@@ -97,7 +100,7 @@ audio_file_open(const struct vfsref *vr)
 	unsigned int i;
 
 	out = g_slice_new0(struct audio_file);
-	
+
 	out->fp = vfs_open(vr);
 	if (out->fp == NULL)
 		goto bad;

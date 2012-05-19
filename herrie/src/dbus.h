@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2006-2009 Ed Schouten <ed@80386.nl>
+ * Copyright (c) 2006-2011 Ed Schouten <ed@80386.nl>
  * All rights reserved.
  *
  * Copyright (c) 2008 Steve Jothen <sjothen@gmail.com>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -13,7 +13,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -36,16 +36,22 @@
  * @brief Initialize DBus locking.
  */
 void dbus_init(void);
-/**
- * @brief Spawn DBus thread.
- */
-void dbus_spawn(void);
 
 /**
  * @brief DBus mutex to provide exclusion between the user input and
  *        DBus event paths.
  */
 extern GMutex *dbus_mtx;
+
+/**
+ * @brief Called before entering the gmainloop
+ */
+void dbus_before_mainloop(void);
+
+/**
+ * @brief Called after exiting the gmainloop
+ */
+void dbus_after_mainloop(void);
 
 /**
  * @brief Acquire a lock on DBus.

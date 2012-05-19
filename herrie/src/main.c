@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2006-2009 Ed Schouten <ed@80386.nl>
+ * Copyright (c) 2006-2011 Ed Schouten <ed@80386.nl>
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -10,7 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -29,6 +29,10 @@
  */
 
 #include "stdinc.h"
+
+#ifdef BUILD_GST
+#include <gst/gst.h>
+#endif /* BUILD_GST */
 
 #include "audio_output.h"
 #include "config.h"
@@ -60,6 +64,9 @@ version(void)
 #ifdef BUILD_VORBIS
 		"- Ogg Vorbis\n"
 #endif /* BUILD_VORBIS */
+#ifdef BUILD_GST
+		"- GStreamer formats\n"
+#endif /* BUILD_GST */
 #ifdef BUILD_MP3
 		"- MP3\n"
 #endif /* BUILD_MP3 */
@@ -112,6 +119,32 @@ usage(void)
 	exit(1);
 }
 
+#if defined(BUILD_DBUS) || defined(BUILD_GST)
+/**
+ * @brief Main loop to process incoming DBus and GStreamer events.
+ */
+static void *
+gmainloop_runner_thread(void *unused)
+{
+	GMainLoop *loop;
+
+	gui_input_sigmask();
+	loop = g_main_loop_new(NULL, FALSE);
+
+#ifdef BUILD_DBUS
+	dbus_before_mainloop();
+#endif /* BUILD_DBUS */
+
+	g_main_loop_run(loop);
+	g_main_loop_unref(loop);
+
+#ifdef BUILD_DBUS
+	dbus_after_mainloop();
+#endif /* BUILD_DBUS */
+	return (NULL);
+}
+#endif /* defined(BUILD_DBUS) || defined(BUILD_GST) */
+
 /**
  * @brief Startup routine for the application.
  */
@@ -125,6 +158,10 @@ main(int argc, char *argv[])
 #ifdef CLOSE_STDERR
 	int devnull;
 #endif /* CLOSE_STDERR */
+
+#ifdef BUILD_GST
+	gst_init(NULL, NULL);
+#endif /* BUILD_GST */
 
 #ifdef BUILD_NLS
 	setlocale(LC_ALL, "");
@@ -177,6 +214,8 @@ main(int argc, char *argv[])
 		return (1);
 	}
 
+	vfs_cache_init();
+
 	/* Initialize the locks */
 #ifdef BUILD_DBUS
 	dbus_init();
@@ -207,9 +246,9 @@ main(int argc, char *argv[])
 
 	/* All set and done - spawn our threads */
 	playq_spawn();
-#ifdef BUILD_DBUS
-	dbus_spawn();
-#endif /* BUILD_DBUS */
+#if defined(BUILD_DBUS) || defined(BUILD_GST)
+	g_thread_create(gmainloop_runner_thread, NULL, 0, NULL);
+#endif /* defined(BUILD_DBUS) || defined(BUILD_GST) */
 #ifdef BUILD_SCROBBLER
 	scrobbler_spawn();
 #endif /* BUILD_SCROBBLER */
