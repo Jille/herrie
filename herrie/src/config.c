@@ -37,7 +37,7 @@
 /**
  * @brief Convert a "yes"/"no" string to a boolean value.
  */
-static int
+int
 string_to_bool(const char *val)
 {
 	if (strcmp(val, "yes") == 0)
@@ -59,6 +59,15 @@ static int
 valid_bool(char *val)
 {
 	return (string_to_bool(val) == -1);
+}
+
+/**
+ * @brief Determine if a boolean string is valid
+ */
+static int
+valid_bool_or_empty(char *val)
+{
+	return (*val == 0 || string_to_bool(val) == -1);
 }
 
 /**
@@ -179,7 +188,7 @@ static struct config_entry configlist[] = {
 	{ "gui.vfslist.scrollpages",	"no",		valid_bool,	NULL },
 	{ "playq.autoplay",		"no",		valid_bool,	NULL },
 	{ "playq.dumpfile",		CONFHOMEDIR PLAYQ_DUMPFILE, NULL, NULL },
-	{ "playq.repeat",		"",		valid_bool,	NULL },
+	{ "playq.repeat",		"",		valid_bool_or_empty,	NULL },
 	{ "playq.xmms",			"no",		valid_bool,	NULL },
 #ifdef BUILD_SCROBBLER
 	{ "scrobbler.dumpfile",		CONFHOMEDIR "scrobbler.queue", NULL, NULL },

@@ -34,6 +34,10 @@
 void		config_load(const char *file, int expand);
 
 /**
+ * @brief Convert a "yes"/"no" string to a boolean value.
+ */
+int		string_to_bool(const char *val);
+/**
  * @brief Return the value of a configuration switch
  */
 const char	*config_getopt(const char *opt);
