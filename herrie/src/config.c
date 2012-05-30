@@ -179,6 +179,7 @@ static struct config_entry configlist[] = {
 	{ "gui.vfslist.scrollpages",	"no",		valid_bool,	NULL },
 	{ "playq.autoplay",		"no",		valid_bool,	NULL },
 	{ "playq.dumpfile",		CONFHOMEDIR PLAYQ_DUMPFILE, NULL, NULL },
+	{ "playq.repeat",		"",		valid_bool,	NULL },
 	{ "playq.xmms",			"no",		valid_bool,	NULL },
 #ifdef BUILD_SCROBBLER
 	{ "scrobbler.dumpfile",		CONFHOMEDIR "scrobbler.queue", NULL, NULL },

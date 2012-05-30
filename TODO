@@ -8,9 +8,7 @@ Graphical user interface:
 - Allow numeric multipliers just like vi
 - Add copy/paste functionality to playlist
 - Use different colors for files, playlists and directories
-- Recursive searching
 - Show whether repeat is turned on
-- Make startup-configuration of repeat-switch configurable
 - Allow Herrie to be controlled outside the interface through /tmp
 - Add the ability to show the filename of the song that's currently playing
 - Allow randomized playback in XMMS mode without shuffling the list
@@ -41,3 +39,6 @@ Virtual filesystem:
 Documentation:
 - Usage guide
 - Write a developers guide?
+
+Other:
+- Raise an error if you have errors in your configuration file
