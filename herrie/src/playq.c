@@ -254,18 +254,10 @@ playq_init(int autoplay, int xmms, int load_dumpfile)
 	if (autoplay || config_getopt_bool("playq.autoplay"))
 		playq_flags &= ~PF_STOP;
 
-	if (xmms || config_getopt_bool("playq.xmms")) {
+	if (xmms || config_getopt_bool("playq.xmms"))
 		funcs = &xmms_funcs;
-		playq_repeat = 1;
-	}
-	switch (config_getopt_bool("playq.repeat")) {
-		case 1:
-			playq_repeat = 1;
-			break;
-		case 0:
-			playq_repeat = 0;
-			break;
-	}
+
+	playq_repeat = config_getopt_bool("playq.repeat");
 
 	filename = config_getopt("playq.dumpfile");
 	if (load_dumpfile && filename[0] != '\0') {
